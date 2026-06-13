@@ -2,11 +2,21 @@ const jwt = require('jsonwebtoken');
 
 function auth(req, res, next) {
   const authHeader = req.headers['authorization'] || req.headers['Authorization'];
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized: no token provided' });
+  let token;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.headers.cookie) {
+    const cookies = req.headers.cookie.split(';').map((cookie) => cookie.trim());
+    const tokenCookie = cookies.find((cookie) => cookie.startsWith('token='));
+    if (tokenCookie) {
+      token = tokenCookie.split('=')[1];
+    }
   }
 
-  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized: no token provided' });
+  }
   const secret = process.env.JWT_SECRET;
 
   if (!secret) {

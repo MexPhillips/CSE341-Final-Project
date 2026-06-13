@@ -79,6 +79,38 @@ const loginPageHTML = `
         transform: translateY(-3px);
         box-shadow: 0 15px 35px rgba(102, 126, 234, 0.6);
       }
+      .token-panel {
+        margin-bottom: 20px;
+      }
+      .token-panel label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+      }
+      .token-panel textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 0.95em;
+        resize: none;
+        margin-bottom: 10px;
+      }
+      .btn-secondary {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        background: #f5f5f5;
+        color: #333;
+      }
+      .btn-secondary:hover {
+        background: #e1e1e1;
+      }
       .divider {
         display: flex;
         align-items: center;
@@ -147,6 +179,12 @@ const loginPageHTML = `
           <input type="password" id="password" name="password" required placeholder="Enter your password">
         </div>
         <div id="error" class="error"></div>
+        <div id="tokenPanel" class="token-panel" style="display:none;">
+          <label for="tokenValue">Your Auth Token</label>
+          <textarea id="tokenValue" readonly rows="4"></textarea>
+          <button id="copyToken" type="button" class="btn btn-secondary">Copy Token</button>
+          <button id="openDocs" type="button" class="btn btn-primary" style="margin-top: 10px; display:none;">Open API Docs</button>
+        </div>
         <button type="submit" class="btn btn-primary">Sign In with Email</button>
       </form>
 
@@ -176,18 +214,35 @@ const loginPageHTML = `
           const res = await fetch('/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ email, password }),
           });
           const data = await res.json();
           if (res.ok && data.token) {
+            const tokenPanel = document.getElementById('tokenPanel');
+            const tokenValue = document.getElementById('tokenValue');
+            const openDocsButton = document.getElementById('openDocs');
+            tokenValue.value = data.token;
+            tokenPanel.style.display = 'block';
+            openDocsButton.style.display = 'block';
             localStorage.setItem('token', data.token);
-            window.location.href = '/api-docs';
           } else {
             errorDiv.textContent = data.error || 'Login failed';
           }
         } catch (err) {
           errorDiv.textContent = 'Network error. Please try again.';
         }
+      });
+
+      document.getElementById('copyToken').addEventListener('click', async () => {
+        const tokenInput = document.getElementById('tokenValue');
+        if (!tokenInput.value) return;
+        await navigator.clipboard.writeText(tokenInput.value);
+        alert('Token copied to clipboard');
+      });
+
+      document.getElementById('openDocs').addEventListener('click', () => {
+        window.location.href = '/api-docs';
       });
     </script>
   </body>
