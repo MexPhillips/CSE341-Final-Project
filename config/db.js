@@ -9,11 +9,9 @@ async function connectDB() {
   }
 
   try {
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log('MongoDB connected');
+    await mongoose.connect(uri);
+    console.log('✓ MongoDB Connected Successfully...');
+    console.log(`✓ Connected to: ${mongoose.connection.host}:${mongoose.connection.port}/${mongoose.connection.name}`);
   } catch (err) {
     console.error('MongoDB connection error:', err.message || err);
     process.exit(1);

@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 const sessionRoutes = require('./routes/sessions');
 const swipeRoutes = require('./routes/swipes');
@@ -111,9 +112,10 @@ app.use('/sessions', sessionRoutes);
 app.use('/swipes', swipeRoutes);
 app.use('/titles', titleRoutes);
 
-// Basic route
+// Landing page
+const landingPageHTML = require('./public/landingPage');
 app.get('/', (req, res) => {
-  res.json({ message: 'BingeMatch API' });
+  res.send(landingPageHTML);
 });
 
 // 404 handler
@@ -128,8 +130,17 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`BingeMatch server listening on port ${PORT}`);
+
+async function startServer() {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`BingeMatch server listening on port ${PORT}`);
+  });
+}
+
+startServer().catch((err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });
 
 module.exports = app;
