@@ -39,7 +39,6 @@ module.exports = function configurePassport() {
             user = await User.create({
               username,
               email,
-              passwordHash: '',
             });
           }
 

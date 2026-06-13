@@ -40,7 +40,7 @@ async function login(req, res) {
 
     const emailLower = email.toLowerCase();
     const user = await User.findOne({ email: emailLower });
-    if (!user) {
+    if (!user || !user.passwordHash) {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
 
