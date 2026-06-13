@@ -36,7 +36,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const { submitSwipe, getMatches, updateSwipe, deleteSwipes } = require('../controllers/swipeController');
+const { submitSwipe, getSwipeById, getMatches, updateSwipe, deleteSwipes } = require('../controllers/swipeController');
 
 router.post('/', auth, submitSwipe);
 
