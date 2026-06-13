@@ -21,8 +21,8 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Local development server',
+        url: process.env.API_BASE_URL || '/',
+        description: 'Current server base URL',
       },
     ],
     components: {
