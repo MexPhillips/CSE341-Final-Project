@@ -38,9 +38,10 @@
  */
 const express = require('express');
 const router = express.Router();
+const asyncHandler = require('../middleware/asyncHandler');
 const { createTitle, getPool, getTitleById, updateTitle, deleteTitle } = require('../controllers/titleController');
 
-router.post('/', createTitle);
+router.post('/', asyncHandler(createTitle));
 
 /**
  * @openapi
@@ -53,7 +54,7 @@ router.post('/', createTitle);
  *       200:
  *         description: A list of available movie titles
  */
-router.get('/pool', getPool);
+router.get('/pool', asyncHandler(getPool));
 
 /**
  * @openapi
@@ -74,7 +75,7 @@ router.get('/pool', getPool);
  *       404:
  *         description: Title not found
  */
-router.get('/:id', getTitleById);
+router.get('/:id', asyncHandler(getTitleById));
 
 /**
  * @openapi
@@ -113,7 +114,7 @@ router.get('/:id', getTitleById);
  *       404:
  *         description: Title not found
  */
-router.put('/:id', updateTitle);
+router.put('/:id', asyncHandler(updateTitle));
 
 /**
  * @openapi
@@ -134,6 +135,6 @@ router.put('/:id', updateTitle);
  *       404:
  *         description: Title not found
  */
-router.delete('/:id', deleteTitle);
+router.delete('/:id', asyncHandler(deleteTitle));
 
 module.exports = router;

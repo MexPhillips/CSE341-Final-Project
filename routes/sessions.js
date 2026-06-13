@@ -16,9 +16,10 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const asyncHandler = require('../middleware/asyncHandler');
 const { createSession, joinSession, getSession, updateSession, deleteSession } = require('../controllers/sessionController');
 
-router.post('/', auth, createSession);
+router.post('/', auth, asyncHandler(createSession));
 
 /**
  * @openapi
@@ -49,7 +50,7 @@ router.post('/', auth, createSession);
  *       404:
  *         description: Active session not found
  */
-router.post('/join', auth, joinSession);
+router.post('/join', auth, asyncHandler(joinSession));
 
 /**
  * @openapi
@@ -72,7 +73,7 @@ router.post('/join', auth, joinSession);
  *       404:
  *         description: Session not found
  */
-router.get('/:id', auth, getSession);
+router.get('/:id', auth, asyncHandler(getSession));
 
 /**
  * @openapi
@@ -110,7 +111,7 @@ router.get('/:id', auth, getSession);
  *       404:
  *         description: Session not found
  */
-router.put('/:id', auth, updateSession);
+router.put('/:id', auth, asyncHandler(updateSession));
 
 /**
  * @openapi
@@ -135,6 +136,6 @@ router.put('/:id', auth, updateSession);
  *       404:
  *         description: Session not found
  */
-router.delete('/:id', auth, deleteSession);
+router.delete('/:id', auth, asyncHandler(deleteSession));
 
 module.exports = router;

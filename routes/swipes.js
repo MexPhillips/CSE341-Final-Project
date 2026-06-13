@@ -36,9 +36,10 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const asyncHandler = require('../middleware/asyncHandler');
 const { submitSwipe, getSwipeById, getMatches, updateSwipe, deleteSwipes } = require('../controllers/swipeController');
 
-router.post('/', auth, submitSwipe);
+router.post('/', auth, asyncHandler(submitSwipe));
 
 /**
  * @openapi
@@ -61,7 +62,7 @@ router.post('/', auth, submitSwipe);
  *       404:
  *         description: Session not found
  */
-router.get('/matches/:sessionId', auth, getMatches);
+router.get('/matches/:sessionId', auth, asyncHandler(getMatches));
 
 /**
  * @openapi
@@ -84,7 +85,7 @@ router.get('/matches/:sessionId', auth, getMatches);
  *       404:
  *         description: Swipe not found
  */
-router.get('/:id', auth, getSwipeById);
+router.get('/:id', auth, asyncHandler(getSwipeById));
 
 /**
  * @openapi
@@ -121,7 +122,7 @@ router.get('/:id', auth, getSwipeById);
  *       404:
  *         description: Swipe not found
  */
-router.put('/:id', auth, updateSwipe);
+router.put('/:id', auth, asyncHandler(updateSwipe));
 
 /**
  * @openapi
@@ -146,6 +147,6 @@ router.put('/:id', auth, updateSwipe);
  *       404:
  *         description: Session not found
  */
-router.delete('/:sessionId', auth, deleteSwipes);
+router.delete('/:sessionId', auth, asyncHandler(deleteSwipes));
 
 module.exports = router;

@@ -37,9 +37,10 @@
 const express = require('express');
 const passport = require('passport');
 const router = express.Router();
+const asyncHandler = require('../middleware/asyncHandler');
 const { register, login, oauthSuccess, oauthFailure } = require('../controllers/authController');
 
-router.post('/register', register);
+router.post('/register', asyncHandler(register));
 
 /**
  * @openapi
@@ -71,7 +72,7 @@ router.post('/register', register);
  *       400:
  *         description: Invalid credentials
  */
-router.post('/login', login);
+router.post('/login', asyncHandler(login));
 
 function requireGithubOAuth(req, res, next) {
   if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
@@ -110,7 +111,7 @@ router.get(
   '/github/callback',
   requireGithubOAuth,
   passport.authenticate('github', { failureRedirect: '/auth/github/failure', session: false }),
-  oauthSuccess
+  asyncHandler(oauthSuccess)
 );
 
 /**
