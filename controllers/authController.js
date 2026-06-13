@@ -50,6 +50,7 @@ async function login(req, res) {
     }
 
     const token = createJwtToken(user);
+    res.cookie('token', token, { httpOnly: true, sameSite: 'Lax' });
 
     return res.json({
       token,
@@ -79,6 +80,12 @@ async function oauthSuccess(req, res) {
     }
 
     const token = createJwtToken(user);
+    res.cookie('token', token, { httpOnly: true, sameSite: 'Lax' });
+
+    if (req.accepts('html')) {
+      return res.redirect('/api-docs');
+    }
+
     return res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
   } catch (err) {
     console.error('OAuth success error:', err);

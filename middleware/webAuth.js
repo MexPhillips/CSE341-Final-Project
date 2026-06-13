@@ -2,9 +2,19 @@ const jwt = require('jsonwebtoken');
 
 function webAuth(req, res, next) {
   const authHeader = req.headers['authorization'] || req.headers['Authorization'];
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    // If no token and it's a browser request, redirect to login
+  let token;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.headers.cookie) {
+    const cookies = req.headers.cookie.split(';').map((cookie) => cookie.trim());
+    const tokenCookie = cookies.find((cookie) => cookie.startsWith('token='));
+    if (tokenCookie) {
+      token = tokenCookie.split('=')[1];
+    }
+  }
+
+  if (!token) {
     const userAgent = req.headers['user-agent'] || '';
     if (userAgent.includes('Mozilla') || userAgent.includes('Chrome') || userAgent.includes('Safari')) {
       return res.redirect('/login');
@@ -12,7 +22,6 @@ function webAuth(req, res, next) {
     return res.status(401).json({ error: 'Unauthorized: no token provided' });
   }
 
-  const token = authHeader.split(' ')[1];
   const secret = process.env.JWT_SECRET;
 
   if (!secret) {
