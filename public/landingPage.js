@@ -51,6 +51,7 @@ const landingPageHTML = `
         text-decoration: none;
         transition: transform 0.3s, box-shadow 0.3s;
         box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        margin: 10px;
       }
       .btn:hover {
         transform: translateY(-3px);
@@ -59,13 +60,22 @@ const landingPageHTML = `
       .btn:active {
         transform: translateY(-1px);
       }
+      .btn-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        justify-content: center;
+        align-items: center;
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>🎬 BingeMatch API</h1>
       <p>A Tinder-style movie picker for groups</p>
-      <a href="/api-docs" class="btn">View API Documentation</a>
+      <div class="btn-container">
+        <a href="/login" class="btn">Sign In to View Docs</a>
+      </div>
     </div>
   </body>
   </html>

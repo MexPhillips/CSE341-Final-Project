@@ -9,6 +9,8 @@ const authRoutes = require('./routes/auth');
 const sessionRoutes = require('./routes/sessions');
 const swipeRoutes = require('./routes/swipes');
 const titleRoutes = require('./routes/titles');
+const auth = require('./middleware/auth');
+const webAuth = require('./middleware/webAuth');
 
 const app = express();
 
@@ -43,7 +45,7 @@ const swaggerOptions = {
 };
 
 const swaggerSpecs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+app.use('/api-docs', webAuth, swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Middleware
 app.use(express.json());
@@ -123,6 +125,11 @@ app.get('/', (req, res) => {
   res.send(landingPageHTML);
 });
 
+// Login page
+const loginPageHTML = require('./public/loginPage');
+app.get('/login', (req, res) => {
+  res.send(loginPageHTML);
+});
 // 404 handler
 app.use((req, res, next) => {
   res.status(404).json({ error: 'Not Found' });
