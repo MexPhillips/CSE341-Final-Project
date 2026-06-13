@@ -31,6 +31,20 @@ async function getPool(req, res) {
   }
 }
 
+async function getTitleById(req, res) {
+  try {
+    const { id } = req.params;
+    const title = await Title.findById(id);
+    if (!title) {
+      return res.status(404).json({ error: 'Title not found' });
+    }
+    return res.json(title);
+  } catch (err) {
+    console.error('getTitleById error:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+}
+
 async function updateTitle(req, res) {
   try {
     const { id } = req.params;
@@ -70,4 +84,4 @@ async function deleteTitle(req, res) {
   }
 }
 
-module.exports = { createTitle, getPool, updateTitle, deleteTitle };
+module.exports = { createTitle, getPool, getTitleById, updateTitle, deleteTitle };

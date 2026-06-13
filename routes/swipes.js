@@ -66,6 +66,29 @@ router.get('/matches/:sessionId', auth, getMatches);
 /**
  * @openapi
  * /swipes/{id}:
+ *   get:
+ *     summary: Get a swipe by id
+ *     tags:
+ *       - Swipes
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Returns the swipe record
+ *       404:
+ *         description: Swipe not found
+ */
+router.get('/:id', auth, getSwipeById);
+
+/**
+ * @openapi
+ * /swipes/{id}:
  *   put:
  *     summary: Update an existing swipe vote
  *     tags:

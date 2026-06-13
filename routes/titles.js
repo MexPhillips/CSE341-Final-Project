@@ -38,7 +38,7 @@
  */
 const express = require('express');
 const router = express.Router();
-const { createTitle, getPool, updateTitle, deleteTitle } = require('../controllers/titleController');
+const { createTitle, getPool, getTitleById, updateTitle, deleteTitle } = require('../controllers/titleController');
 
 router.post('/', createTitle);
 
@@ -54,6 +54,27 @@ router.post('/', createTitle);
  *         description: A list of available movie titles
  */
 router.get('/pool', getPool);
+
+/**
+ * @openapi
+ * /titles/{id}:
+ *   get:
+ *     summary: Get a title by id
+ *     tags:
+ *       - Titles
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Returns the title by id
+ *       404:
+ *         description: Title not found
+ */
+router.get('/:id', getTitleById);
 
 /**
  * @openapi

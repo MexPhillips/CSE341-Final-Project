@@ -39,6 +39,23 @@ async function submitSwipe(req, res) {
   }
 }
 
+async function getSwipeById(req, res) {
+  try {
+    const { id } = req.params;
+    const swipe = await Swipe.findById(id)
+      .populate('sessionId', 'roomCode status')
+      .populate('titleId', 'title posterPath overview type')
+      .populate('userId', 'username email');
+    if (!swipe) {
+      return res.status(404).json({ error: 'Swipe not found' });
+    }
+    return res.json(swipe);
+  } catch (err) {
+    console.error('getSwipeById error:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+}
+
 async function getMatches(req, res) {
   try {
     const { sessionId } = req.params;
@@ -129,4 +146,4 @@ async function deleteSwipes(req, res) {
   }
 }
 
-module.exports = { submitSwipe, getMatches, updateSwipe, deleteSwipes };
+module.exports = { submitSwipe, getSwipeById, getMatches, updateSwipe, deleteSwipes };
