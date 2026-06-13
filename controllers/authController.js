@@ -49,13 +49,7 @@ async function login(req, res) {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      console.error('JWT_SECRET is not defined in environment');
-      return res.status(500).json({ error: 'Server configuration error' });
-    }
-
-    const token = jwt.sign({ id: user._id }, secret, { expiresIn: '24h' });
+    const token = createJwtToken(user);
 
     return res.json({
       token,
@@ -67,4 +61,33 @@ async function login(req, res) {
   }
 }
 
-module.exports = { register, login };
+function createJwtToken(user) {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    console.error('JWT_SECRET is not defined in environment');
+    throw new Error('Server configuration error');
+  }
+
+  return jwt.sign({ id: user._id }, secret, { expiresIn: '24h' });
+}
+
+async function oauthSuccess(req, res) {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(400).json({ error: 'OAuth login failed' });
+    }
+
+    const token = createJwtToken(user);
+    return res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
+  } catch (err) {
+    console.error('OAuth success error:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+}
+
+async function oauthFailure(req, res) {
+  return res.status(401).json({ error: 'OAuth authentication failed' });
+}
+
+module.exports = { register, login, oauthSuccess, oauthFailure };

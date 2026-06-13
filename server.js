@@ -1,14 +1,18 @@
 require('dotenv').config();
 const express = require('express');
+const passport = require('passport');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const connectDB = require('./config/db');
+const configurePassport = require('./config/passport');
 const authRoutes = require('./routes/auth');
 const sessionRoutes = require('./routes/sessions');
 const swipeRoutes = require('./routes/swipes');
 const titleRoutes = require('./routes/titles');
 
 const app = express();
+
+const isGoogleOAuthEnabled = configurePassport();
 
 // Swagger setup
 const swaggerOptions = {
@@ -43,6 +47,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // Middleware
 app.use(express.json());
+app.use(passport.initialize());
 
 /**
  * @openapi

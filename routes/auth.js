@@ -35,8 +35,9 @@
  *         description: User already exists
  */
 const express = require('express');
+const passport = require('passport');
 const router = express.Router();
-const { register, login } = require('../controllers/authController');
+const { register, login, oauthSuccess, oauthFailure } = require('../controllers/authController');
 
 router.post('/register', register);
 
@@ -71,5 +72,58 @@ router.post('/register', register);
  *         description: Invalid credentials
  */
 router.post('/login', login);
+
+function requireGithubOAuth(req, res, next) {
+  if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
+    return res.status(503).json({ error: 'GitHub OAuth is not configured' });
+  }
+  next();
+}
+
+/**
+ * @openapi
+ * /auth/github:
+ *   get:
+ *     summary: Start GitHub OAuth login flow
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       302:
+ *         description: Redirects to GitHub login
+ */
+router.get('/github', requireGithubOAuth, passport.authenticate('github', { scope: ['user:email'] }));
+
+/**
+ * @openapi
+ * /auth/github/callback:
+ *   get:
+ *     summary: GitHub OAuth callback endpoint
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: OAuth login successful and JWT returned
+ *       401:
+ *         description: OAuth login failed
+ */
+router.get(
+  '/github/callback',
+  requireGithubOAuth,
+  passport.authenticate('github', { failureRedirect: '/auth/github/failure', session: false }),
+  oauthSuccess
+);
+
+/**
+ * @openapi
+ * /auth/github/failure:
+ *   get:
+ *     summary: GitHub OAuth failure redirect
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       401:
+ *         description: OAuth authentication failed
+ */
+router.get('/github/failure', oauthFailure);
 
 module.exports = router;
