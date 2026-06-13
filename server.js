@@ -45,7 +45,19 @@ const swaggerOptions = {
 };
 
 const swaggerSpecs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', webAuth, swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+app.use(
+  '/api-docs',
+  webAuth,
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpecs, {
+    swaggerOptions: {
+      requestInterceptor: (request) => {
+        request.credentials = 'include';
+        return request;
+      },
+    },
+  })
+);
 
 // Middleware
 app.use(express.json());
