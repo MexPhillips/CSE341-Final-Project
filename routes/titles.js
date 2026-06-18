@@ -39,9 +39,28 @@
 const express = require('express');
 const router = express.Router();
 const asyncHandler = require('../middleware/asyncHandler');
+const { validate, Joi } = require('../middleware/validate');
 const { createTitle, getPool, getTitleById, updateTitle, deleteTitle } = require('../controllers/titleController');
 
-router.post('/', asyncHandler(createTitle));
+const createTitleSchema = Joi.object({
+  tmdbId: Joi.number().optional(),
+  title: Joi.string().min(1).required(),
+  posterPath: Joi.string().optional(),
+  overview: Joi.string().optional(),
+  type: Joi.string().valid('movie', 'tv').optional(),
+});
+
+const updateTitleSchema = Joi.object({
+  id: Joi.string().required(),
+  tmdbId: Joi.number().optional(),
+  title: Joi.string().optional(),
+  posterPath: Joi.string().optional(),
+  overview: Joi.string().optional(),
+  type: Joi.string().valid('movie', 'tv').optional(),
+});
+
+router.post('/', validate(createTitleSchema), asyncHandler(createTitle));
+router.put('/:id', validate(updateTitleSchema), asyncHandler(updateTitle));
 
 /**
  * @openapi

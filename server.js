@@ -9,6 +9,7 @@ const authRoutes = require('./routes/auth');
 const sessionRoutes = require('./routes/sessions');
 const swipeRoutes = require('./routes/swipes');
 const titleRoutes = require('./routes/titles');
+const userRoutes = require('./routes/users');
 const auth = require('./middleware/auth');
 const webAuth = require('./middleware/webAuth');
 
@@ -130,6 +131,7 @@ app.use('/auth', authRoutes);
 app.use('/sessions', sessionRoutes);
 app.use('/swipes', swipeRoutes);
 app.use('/titles', titleRoutes);
+app.use('/users', userRoutes);
 
 // Landing page
 const landingPageHTML = require('./public/landingPage');
@@ -157,14 +159,20 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer() {
   await connectDB();
-  app.listen(PORT, () => {
-    console.log(`BingeMatch server listening on port ${PORT}`);
+  return new Promise((resolve, reject) => {
+    const server = app.listen(PORT, () => {
+      console.log(`BingeMatch server listening on port ${PORT}`);
+      resolve(server);
+    });
+    server.on('error', (err) => reject(err));
   });
 }
 
-startServer().catch((err) => {
-  console.error('Failed to start server:', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  startServer().catch((err) => {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  });
+}
 
-module.exports = app;
+module.exports = { app, startServer };

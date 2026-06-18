@@ -17,9 +17,15 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const asyncHandler = require('../middleware/asyncHandler');
+const { validate, Joi } = require('../middleware/validate');
 const { createSession, joinSession, getSession, updateSession, deleteSession } = require('../controllers/sessionController');
 
+const joinSchema = Joi.object({ roomCode: Joi.string().required() });
+const updateSessionSchema = Joi.object({ id: Joi.string().required(), status: Joi.string().valid('active','closed').required() });
+
 router.post('/', auth, asyncHandler(createSession));
+router.post('/join', auth, validate(joinSchema), asyncHandler(joinSession));
+router.put('/:id', auth, validate(updateSessionSchema), asyncHandler(updateSession));
 
 /**
  * @openapi

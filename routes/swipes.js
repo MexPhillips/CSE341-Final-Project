@@ -37,9 +37,21 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const asyncHandler = require('../middleware/asyncHandler');
+const { validate, Joi } = require('../middleware/validate');
 const { submitSwipe, getSwipeById, getMatches, updateSwipe, deleteSwipes } = require('../controllers/swipeController');
 
-router.post('/', auth, asyncHandler(submitSwipe));
+const submitSwipeSchema = Joi.object({
+  sessionId: Joi.string().required(),
+  titleId: Joi.string().required(),
+  vote: Joi.boolean().required(),
+});
+
+const updateSwipeSchema = Joi.object({
+  id: Joi.string().required(),
+  vote: Joi.boolean().required(),
+});
+
+router.post('/', auth, validate(submitSwipeSchema), asyncHandler(submitSwipe));
 
 /**
  * @openapi

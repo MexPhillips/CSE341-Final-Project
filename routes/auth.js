@@ -38,9 +38,21 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 const asyncHandler = require('../middleware/asyncHandler');
+const { validate, Joi } = require('../middleware/validate');
 const { register, login, oauthSuccess, oauthFailure } = require('../controllers/authController');
 
-router.post('/register', asyncHandler(register));
+const registerSchema = Joi.object({
+  username: Joi.string().min(3).max(30).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+});
+
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+});
+
+router.post('/register', validate(registerSchema), asyncHandler(register));
 
 /**
  * @openapi
@@ -107,12 +119,20 @@ router.get('/github', requireGithubOAuth, passport.authenticate('github', { scop
  *       401:
  *         description: OAuth login failed
  */
-router.get(
-  '/github/callback',
-  requireGithubOAuth,
-  passport.authenticate('github', { failureRedirect: '/auth/github/failure', session: false }),
-  asyncHandler(oauthSuccess)
-);
+router.get('/github/callback', requireGithubOAuth, (req, res, next) => {
+  passport.authenticate('github', { failureRedirect: '/auth/github/failure', session: false }, async (err, user, info) => {
+    if (err) {
+      console.error('GitHub OAuth callback error:', err);
+      return res.status(500).json({ error: 'GitHub OAuth error', details: err.message });
+    }
+    if (!user) {
+      console.error('GitHub OAuth callback failed:', info);
+      return res.redirect('/auth/github/failure');
+    }
+    req.user = user;
+    return oauthSuccess(req, res, next);
+  })(req, res, next);
+});
 
 /**
  * @openapi
