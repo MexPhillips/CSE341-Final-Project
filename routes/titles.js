@@ -51,16 +51,14 @@ const createTitleSchema = Joi.object({
 });
 
 const updateTitleSchema = Joi.object({
-  id: Joi.string().required(),
   tmdbId: Joi.number().optional(),
   title: Joi.string().optional(),
   posterPath: Joi.string().optional(),
   overview: Joi.string().optional(),
   type: Joi.string().valid('movie', 'tv').optional(),
-});
+}).min(1);
 
 router.post('/', validate(createTitleSchema), asyncHandler(createTitle));
-router.put('/:id', validate(updateTitleSchema), asyncHandler(updateTitle));
 
 /**
  * @openapi
@@ -133,7 +131,7 @@ router.get('/:id', asyncHandler(getTitleById));
  *       404:
  *         description: Title not found
  */
-router.put('/:id', asyncHandler(updateTitle));
+router.put('/:id', validate(updateTitleSchema), asyncHandler(updateTitle));
 
 /**
  * @openapi

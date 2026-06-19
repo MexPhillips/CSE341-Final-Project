@@ -143,4 +143,64 @@ async function oauthFailure(req, res) {
   return res.status(401).json({ error: 'OAuth authentication failed' });
 }
 
-module.exports = { register, login, oauthSuccess, oauthFailure };
+async function changePassword(req, res) {
+  try {
+    const { id } = req.params;
+    const { currentPassword, newPassword } = req.body || {};
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'currentPassword and newPassword are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'New password must be at least 6 characters' });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (req.user.id !== id) {
+      return res.status(403).json({ error: 'Can only change your own password' });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Current password is incorrect' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const newHash = await bcrypt.hash(newPassword, salt);
+    user.passwordHash = newHash;
+    await user.save();
+
+    return res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    console.error('changePassword error:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+}
+
+async function deleteAccount(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (req.user.id !== id) {
+      return res.status(403).json({ error: 'Can only delete your own account' });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await user.deleteOne();
+    return res.json({ message: 'Account deleted successfully' });
+  } catch (err) {
+    console.error('deleteAccount error:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+}
+
+module.exports = { register, login, oauthSuccess, oauthFailure, changePassword, deleteAccount };
