@@ -39,7 +39,7 @@ const passport = require('passport');
 const router = express.Router();
 const asyncHandler = require('../middleware/asyncHandler');
 const { validate, Joi } = require('../middleware/validate');
-const { register, login, oauthSuccess, oauthFailure } = require('../controllers/authController');
+const { register, login, oauthSuccess, oauthFailure, changePassword, deleteAccount } = require('../controllers/authController');
 
 const registerSchema = Joi.object({
   username: Joi.string().min(3).max(30).required(),
@@ -50,6 +50,15 @@ const registerSchema = Joi.object({
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),
+});
+
+const changePasswordSchema = Joi.object({
+  currentPassword: Joi.string().required(),
+  newPassword: Joi.string().min(6).required(),
+});
+
+const deleteAccountSchema = Joi.object({
+  id: Joi.string().required(),
 });
 
 router.post('/register', validate(registerSchema), asyncHandler(register));
@@ -108,43 +117,70 @@ router.get('/github', requireGithubOAuth, passport.authenticate('github', { scop
 
 /**
  * @openapi
- * /auth/github/callback:
- *   get:
- *     summary: GitHub OAuth callback endpoint
+ * /auth/{id}:
+ *   put:
+ *     summary: Change user password
  *     tags:
  *       - Authentication
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 example: oldPassword123
+ *               newPassword:
+ *                 type: string
+ *                 example: newPassword456
  *     responses:
  *       200:
- *         description: OAuth login successful and JWT returned
- *       401:
- *         description: OAuth login failed
+ *         description: Password changed successfully
+ *       400:
+ *         description: Missing fields or invalid password
+ *       403:
+ *         description: Can only change your own password
+ *       404:
+ *         description: User not found
  */
-router.get('/github/callback', requireGithubOAuth, (req, res, next) => {
-  passport.authenticate('github', { failureRedirect: '/auth/github/failure', session: false }, async (err, user, info) => {
-    if (err) {
-      console.error('GitHub OAuth callback error:', err);
-      return res.status(500).json({ error: 'GitHub OAuth error', details: err.message });
-    }
-    if (!user) {
-      console.error('GitHub OAuth callback failed:', info);
-      return res.redirect('/auth/github/failure');
-    }
-    req.user = user;
-    return oauthSuccess(req, res, next);
-  })(req, res, next);
-});
+router.put('/:id', auth, validate(changePasswordSchema), asyncHandler(changePassword));
 
 /**
  * @openapi
- * /auth/github/failure:
- *   get:
- *     summary: GitHub OAuth failure redirect
+ * /auth/{id}:
+ *   delete:
+ *     summary: Delete user account
  *     tags:
  *       - Authentication
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
- *       401:
- *         description: OAuth authentication failed
+ *       200:
+ *         description: Account deleted successfully
+ *       403:
+ *         description: Can only delete your own account
+ *       404:
+ *         description: User not found
  */
-router.get('/github/failure', oauthFailure);
+router.delete('/:id', auth, asyncHandler(deleteAccount));
 
 module.exports = router;
