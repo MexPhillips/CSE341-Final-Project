@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const session = require('express-session');
 const passport = require('passport');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
@@ -66,9 +67,24 @@ app.use(
   })
 );
 
+// Session middleware (must be before passport)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'your-session-secret-change-in-env',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    },
+  })
+);
+
 // Middleware
 app.use(express.json());
 app.use(passport.initialize());
+app.use(passport.session());
 
 /**
  * @openapi
