@@ -117,7 +117,7 @@ router.get('/github', requireGithubOAuth, passport.authenticate('github', { scop
 
 /**
  * @openapi
- * /auth/{id}:
+ * /auth/{username}:
  *   put:
  *     summary: Change user password
  *     tags:
@@ -126,7 +126,7 @@ router.get('/github', requireGithubOAuth, passport.authenticate('github', { scop
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: username
  *         required: true
  *         schema:
  *           type: string
@@ -156,11 +156,11 @@ router.get('/github', requireGithubOAuth, passport.authenticate('github', { scop
  *       404:
  *         description: User not found
  */
-router.put('/:id', auth, validate(changePasswordSchema), asyncHandler(changePassword));
+router.put('/:username', auth, validate(changePasswordSchema), asyncHandler(changePassword));
 
 /**
  * @openapi
- * /auth/{id}:
+ * /auth/{username}:
  *   delete:
  *     summary: Delete user account
  *     tags:
@@ -169,7 +169,7 @@ router.put('/:id', auth, validate(changePasswordSchema), asyncHandler(changePass
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: username
  *         required: true
  *         schema:
  *           type: string
@@ -181,6 +181,6 @@ router.put('/:id', auth, validate(changePasswordSchema), asyncHandler(changePass
  *       404:
  *         description: User not found
  */
-router.delete('/:id', auth, asyncHandler(deleteAccount));
+router.delete('/:username', auth, asyncHandler(deleteAccount));
 
 module.exports = router;

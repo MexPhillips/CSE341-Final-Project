@@ -184,15 +184,15 @@ async function changePassword(req, res) {
 
 async function deleteAccount(req, res) {
   try {
-    const { id } = req.params;
+    const { username } = req.params;
 
-    if (req.user.id !== id) {
-      return res.status(403).json({ error: 'Can only delete your own account' });
-    }
-
-    const user = await User.findById(id);
+    const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (req.user.id !== user._id.toString()) {
+      return res.status(403).json({ error: 'Can only delete your own account' });
     }
 
     await user.deleteOne();
