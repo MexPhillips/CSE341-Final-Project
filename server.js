@@ -40,6 +40,12 @@ const swaggerOptions = {
         },
       },
     },
+    tags: [
+      { name: 'Sessions', description: 'Session related endpoints' },
+      { name: 'Swipes', description: 'Swipe and match endpoints' },
+      { name: 'Titles', description: 'Title lookup endpoints' },
+      { name: 'Users', description: 'User collection endpoints' },
+    ],
   },
   apis: ['./routes/*.js'],
 };

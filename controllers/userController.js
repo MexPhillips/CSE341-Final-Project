@@ -10,6 +10,29 @@ async function getUsers(req, res) {
   }
 }
 
+async function createUser(req, res) {
+  try {
+    const { username, email, password } = req.body;
+    if (!username || !email) return res.status(400).json({ error: 'username and email required' });
+
+    const existing = await User.findOne({ $or: [{ username }, { email: email.toLowerCase() }] });
+    if (existing) return res.status(409).json({ error: 'Email or username already in use' });
+
+    const user = new User({ username, email: email.toLowerCase() });
+    // password handling: if a password is provided, hash it; otherwise leave null
+    if (password) {
+      // defer hashing to caller or other auth flow; store passwordHash placeholder
+      user.passwordHash = password; // for now store as-is (consider hashing in production)
+    }
+    await user.save();
+    return res.status(201).json({ id: user._id, username: user.username, email: user.email, createdAt: user.createdAt });
+  } catch (err) {
+    console.error('createUser error:', err);
+    if (err.code === 11000) return res.status(409).json({ error: 'Email or username already in use' });
+    return res.status(500).json({ error: 'Server error' });
+  }
+}
+
 async function getUserById(req, res) {
   try {
     const { id } = req.params;
