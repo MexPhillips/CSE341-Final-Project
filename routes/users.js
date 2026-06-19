@@ -35,7 +35,7 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const asyncHandler = require('../middleware/asyncHandler');
-const { getUsers, getUserById, updateUser, deleteUser } = require('../controllers/userController');
+const { getUsers, getUserById, createUser, updateUser, deleteUser } = require('../controllers/userController');
 
 router.get('/', auth, asyncHandler(getUsers));
 router.post('/', asyncHandler(createUser));
