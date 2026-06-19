@@ -5,7 +5,6 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const connectDB = require('./config/db');
 const configurePassport = require('./config/passport');
-const authRoutes = require('./routes/auth');
 const sessionRoutes = require('./routes/sessions');
 const swipeRoutes = require('./routes/swipes');
 const titleRoutes = require('./routes/titles');
@@ -66,32 +65,6 @@ app.use(passport.initialize());
 
 /**
  * @openapi
- * /auth/register:
- *   post:
- *     summary: Register a new user
- *     tags:
- *       - Authentication
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *     responses:
- *       201:
- *         description: User created successfully
- */
-
-/**
- * @openapi
  * /sessions/{id}:
  *   get:
  *     summary: Fetch session details by id
@@ -127,7 +100,6 @@ app.use(passport.initialize());
  */
 
 // Route mounts
-app.use('/auth', authRoutes);
 app.use('/sessions', sessionRoutes);
 app.use('/swipes', swipeRoutes);
 app.use('/titles', titleRoutes);
@@ -144,6 +116,7 @@ const loginPageHTML = require('./public/loginPage');
 app.get('/login', (req, res) => {
   res.send(loginPageHTML);
 });
+
 // 404 handler
 app.use((req, res, next) => {
   res.status(404).json({ error: 'Not Found' });
