@@ -37,6 +37,7 @@
 const express = require('express');
 const passport = require('passport');
 const router = express.Router();
+const auth = require('../middleware/auth');
 const asyncHandler = require('../middleware/asyncHandler');
 const { validate, Joi } = require('../middleware/validate');
 const { register, login, oauthSuccess, oauthFailure, changePassword, deleteAccount } = require('../controllers/authController');
