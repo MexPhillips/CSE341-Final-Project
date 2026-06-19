@@ -162,6 +162,30 @@ const loginPageHTML = `
         font-size: 0.9em;
         margin-top: 5px;
       }
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .button-group button,
+      .button-group a {
+        flex: 1;
+        padding: 12px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        display: inline-block;
+        font-size: 1em;
+      }
+      .button-group button:hover,
+      .button-group a:hover {
+        background: #764ba2;
+      }
     </style>
   </head>
   <body>
@@ -182,8 +206,10 @@ const loginPageHTML = `
         <div id="tokenPanel" class="token-panel" style="display:none;">
           <label for="tokenValue">Your Auth Token</label>
           <textarea id="tokenValue" readonly rows="4"></textarea>
-          <button id="copyToken" type="button" class="btn btn-secondary">Copy Token</button>
-          <button id="openDocs" type="button" class="btn btn-primary" style="margin-top: 10px; display:none;">Open API Docs</button>
+          <div class="button-group">
+            <button id="copyToken" type="button">Copy Token</button>
+            <a href="/api-docs" id="openDocs">View API Docs</a>
+          </div>
         </div>
         <button type="submit" class="btn btn-primary">Sign In with Email</button>
       </form>
@@ -221,10 +247,8 @@ const loginPageHTML = `
           if (res.ok && data.token) {
             const tokenPanel = document.getElementById('tokenPanel');
             const tokenValue = document.getElementById('tokenValue');
-            const openDocsButton = document.getElementById('openDocs');
             tokenValue.value = data.token;
             tokenPanel.style.display = 'block';
-            openDocsButton.style.display = 'block';
             localStorage.setItem('token', data.token);
           } else {
             errorDiv.textContent = data.error || 'Login failed';
@@ -239,10 +263,6 @@ const loginPageHTML = `
         if (!tokenInput.value) return;
         await navigator.clipboard.writeText(tokenInput.value);
         alert('Token copied to clipboard');
-      });
-
-      document.getElementById('openDocs').addEventListener('click', () => {
-        window.location.href = '/api-docs';
       });
     </script>
   </body>

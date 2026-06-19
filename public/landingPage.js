@@ -107,6 +107,29 @@ const landingPageHTML = `
       .btn-secondary:hover {
         background: #764ba2;
       }
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .button-group button,
+      .button-group a {
+        flex: 1;
+        padding: 10px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        display: inline-block;
+      }
+      .button-group button:hover,
+      .button-group a:hover {
+        background: #764ba2;
+      }
       .success-msg {
         color: #27ae60;
         margin-top: 10px;
@@ -124,7 +147,10 @@ const landingPageHTML = `
       <div id="tokenPanel" class="token-panel">
         <h3>Your JWT Token</h3>
         <textarea id="tokenText" readonly></textarea>
-        <button class="btn-secondary" onclick="copyToken()">Copy Token</button>
+        <div class="button-group">
+          <button onclick="copyToken()">Copy Token</button>
+          <a href="/api-docs">View API Docs</a>
+        </div>
         <div id="successMsg" class="success-msg" style="display: none;">Token copied to clipboard!</div>
       </div>
     </div>
