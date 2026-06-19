@@ -67,6 +67,51 @@ const landingPageHTML = `
         justify-content: center;
         align-items: center;
       }
+      .token-panel {
+        background: #f5f5f5;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 30px;
+        text-align: left;
+        display: none;
+      }
+      .token-panel.visible {
+        display: block;
+      }
+      .token-panel h3 {
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+      }
+      .token-panel textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 0.85em;
+        resize: none;
+        height: 100px;
+        font-family: monospace;
+        margin-bottom: 10px;
+      }
+      .btn-secondary {
+        width: 100%;
+        padding: 10px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .btn-secondary:hover {
+        background: #764ba2;
+      }
+      .success-msg {
+        color: #27ae60;
+        margin-top: 10px;
+        font-size: 0.9em;
+      }
     </style>
   </head>
   <body>
@@ -76,7 +121,37 @@ const landingPageHTML = `
       <div class="btn-container">
         <a href="/login" class="btn">Sign In to View Docs</a>
       </div>
+      <div id="tokenPanel" class="token-panel">
+        <h3>Your JWT Token</h3>
+        <textarea id="tokenText" readonly></textarea>
+        <button class="btn-secondary" onclick="copyToken()">Copy Token</button>
+        <div id="successMsg" class="success-msg" style="display: none;">Token copied to clipboard!</div>
+      </div>
     </div>
+
+    <script>
+      function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+      }
+
+      function copyToken() {
+        const tokenText = document.getElementById('tokenText');
+        tokenText.select();
+        document.execCommand('copy');
+        const successMsg = document.getElementById('successMsg');
+        successMsg.style.display = 'block';
+        setTimeout(() => {
+          successMsg.style.display = 'none';
+        }, 2000);
+      }
+
+      const token = getQueryParam('token');
+      if (token) {
+        document.getElementById('tokenPanel').classList.add('visible');
+        document.getElementById('tokenText').value = token;
+      }
+    </script>
   </body>
   </html>
 `;

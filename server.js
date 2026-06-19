@@ -9,6 +9,7 @@ const sessionRoutes = require('./routes/sessions');
 const swipeRoutes = require('./routes/swipes');
 const titleRoutes = require('./routes/titles');
 const userRoutes = require('./routes/users');
+const authRoutes = require('./routes/auth');
 const auth = require('./middleware/auth');
 const webAuth = require('./middleware/webAuth');
 
@@ -106,6 +107,7 @@ app.use(passport.initialize());
  */
 
 // Route mounts
+app.use('/auth', authRoutes);
 app.use('/sessions', sessionRoutes);
 app.use('/swipes', swipeRoutes);
 app.use('/titles', titleRoutes);
